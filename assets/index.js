@@ -68,20 +68,15 @@ imageInput.addEventListener('change', () => {
 
 document.querySelector(".go").addEventListener('click', () => {
     var empty = [];
-    var params = new URLSearchParams();
+    var formData = {};
 
-    params.set("sex", sex);
+    formData.sex = sex;
 
     if (!upload.hasAttribute("selected")) {
         empty.push(upload);
         upload.classList.add("error_shown");
     } else {
-        try {
-            localStorage.setItem("userImage", upload.getAttribute("selected"));
-        } catch (e) {
-            alert("Zdjęcie jest za duże. Wybierz mniejsze.");
-            return;
-        }
+        formData.image = upload.getAttribute("selected");
     }
 
     var birthday = "";
@@ -99,7 +94,7 @@ document.querySelector(".go").addEventListener('click', () => {
         dateElement.classList.add("error_shown");
         empty.push(dateElement);
     } else {
-        params.set("birthday", birthday);
+        formData.birthday = birthday;
     }
 
     document.querySelectorAll(".input_holder").forEach((element) => {
@@ -108,7 +103,7 @@ document.querySelector(".go").addEventListener('click', () => {
             empty.push(element);
             element.classList.add("error_shown");
         } else {
-            params.set(input.id, input.value);
+            formData[input.id] = input.value;
         }
     });
 
@@ -117,7 +112,16 @@ document.querySelector(".go").addEventListener('click', () => {
         return;
     }
 
-    location.href = "id.html?" + params.toString();
+    // zapisujemy WSZYSTKIE dane
+    try {
+        localStorage.setItem("mobywatelData", JSON.stringify(formData));
+        localStorage.setItem("userImage", formData.image);
+    } catch (e) {
+        alert("Zdjęcie jest za duże. Wybierz mniejsze zdjęcie.");
+        return;
+    }
+
+    location.href = "id.html";
 });
 
 function isEmpty(value) {
