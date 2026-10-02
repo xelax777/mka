@@ -72,7 +72,7 @@ for (var key of params.keys()){
   data[key] = params.get(key);
 }
 
-var imageUrl = localStorage.getItem("userImage") || data['image'];
+var imageUrl = localStorage.getItem("userImage") || data['image'] || "";
 document.querySelector(".id_own_image").style.backgroundImage = `url(${imageUrl})`;
 
 var birthday = data['birthday'];
