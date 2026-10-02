@@ -29,12 +29,10 @@ imageInput.type = "file";
 imageInput.accept = ".jpeg,.png,.gif";
 
 document.querySelectorAll(".input_holder").forEach((element) => {
-
     var input = element.querySelector(".input");
     input.addEventListener('click', () => {
         element.classList.remove("error_shown");
     })
-
 });
 
 upload.addEventListener('click', () => {
@@ -43,7 +41,6 @@ upload.addEventListener('click', () => {
 });
 
 imageInput.addEventListener('change', (event) => {
-
     upload.classList.remove("upload_loaded");
     upload.classList.add("upload_loading");
     upload.removeAttribute("selected");
@@ -61,4 +58,15 @@ imageInput.addEventListener('change', (event) => {
         upload.setAttribute("selected", url);
         upload.classList.add("upload_loaded");
         upload.classList.remove("upload_loading");
-        upload.querySelector(".upload_uploaded").src 
+        upload.querySelector(".upload_uploaded").src = url;
+    };
+    reader.onerror = () => {
+        upload.classList.remove("upload_loading");
+        upload.classList.add("error_shown");
+    };
+    reader.readAsDataURL(file);
+})
+
+document.querySelector(".go").addEventListener('click', () => {
+
+    var empty = 
