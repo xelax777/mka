@@ -1,5 +1,5 @@
 document.querySelector(".login").addEventListener('click', () => {
-    toHome();
+    location.href = "home.html";
 });
 
 var welcome = "Dzień dobry!";
@@ -8,11 +8,6 @@ if (date.getHours() >= 18) {
     welcome = "Dobry wieczór!";
 }
 document.querySelector(".welcome").innerHTML = welcome;
-
-function toHome() {
-    // względna ścieżka – działa na GitHub Pages
-    location.href = "home.html";
-}
 
 var input = document.querySelector(".password_input");
 input.addEventListener("keypress", (event) => {
