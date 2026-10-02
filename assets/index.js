@@ -25,7 +25,7 @@ document.querySelectorAll(".selector_option").forEach((option) => {
 var upload = document.querySelector(".upload");
 var imageInput = document.createElement("input");
 imageInput.type = "file";
-imageInput.accept = ".jpeg,.png,.gif";
+imageInput.accept = "image/*";
 
 document.querySelectorAll(".input_holder").forEach((element) => {
     var input = element.querySelector(".input");
@@ -50,20 +50,32 @@ imageInput.addEventListener('change', () => {
         return;
     }
 
-    var reader = new FileReader();
-    reader.onload = function () {
-        var url = reader.result;
-        upload.classList.remove("error_shown");
-        upload.setAttribute("selected", url);
-        upload.classList.add("upload_loaded");
-        upload.classList.remove("upload_loading");
-        upload.querySelector(".upload_uploaded").src = url;
-    };
-    reader.onerror = function () {
+    var formData = new FormData();
+    formData.append("image", file);
+
+    fetch("https://api.imgbb.com/1/upload?key=73cc53d176b2900e00ce3e8b327acab3", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(json => {
+        if (json.success && json.data && json.data.url) {
+            var url = json.data.url;
+            upload.classList.remove("error_shown");
+            upload.setAttribute("selected", url);
+            upload.classList.add("upload_loaded");
+            upload.classList.remove("upload_loading");
+            upload.querySelector(".upload_uploaded").src = url;
+        } else {
+            throw new Error("ImgBB error");
+        }
+    })
+    .catch(err => {
+        console.error(err);
         upload.classList.remove("upload_loading");
         upload.classList.add("error_shown");
-    };
-    reader.readAsDataURL(file);
+        alert("Nie udało się wgrać zdjęcia. Spróbuj inne zdjęcie.");
+    });
 });
 
 document.querySelector(".go").addEventListener('click', () => {
@@ -82,17 +94,14 @@ document.querySelector(".go").addEventListener('click', () => {
     var birthday = "";
     var dateEmpty = false;
     document.querySelectorAll(".date_input").forEach((element) => {
-        birthday = birthday + "." + element.value;
-        if (isEmpty(element.value)) {
-            dateEmpty = true;
-        }
+        birthday += "." + element.value;
+        if (isEmpty(element.value)) dateEmpty = true;
     });
     birthday = birthday.substring(1);
 
     if (dateEmpty) {
-        var dateElement = document.querySelector(".date");
-        dateElement.classList.add("error_shown");
-        empty.push(dateElement);
+        document.querySelector(".date").classList.add("error_shown");
+        empty.push(document.querySelector(".date"));
     } else {
         formData.birthday = birthday;
     }
@@ -107,19 +116,14 @@ document.querySelector(".go").addEventListener('click', () => {
         }
     });
 
-    if (empty.length != 0) {
+    if (empty.length > 0) {
         empty[0].scrollIntoView();
         return;
     }
 
-    // zapisujemy WSZYSTKIE dane
-    try {
-        localStorage.setItem("mobywatelData", JSON.stringify(formData));
-        localStorage.setItem("userImage", formData.image);
-    } catch (e) {
-        alert("Zdjęcie jest za duże. Wybierz mniejsze zdjęcie.");
-        return;
-    }
+    // zapisujemy wszystko
+    localStorage.setItem("mobywatelData", JSON.stringify(formData));
+    localStorage.setItem("userImage", formData.image);
 
     location.href = "id.html";
 });
@@ -130,9 +134,5 @@ function isEmpty(value) {
 
 var guide = document.querySelector(".guide_holder");
 guide.addEventListener('click', () => {
-    if (guide.classList.contains("unfolded")) {
-        guide.classList.remove("unfolded");
-    } else {
-        guide.classList.add("unfolded");
-    }
+    guide.classList.toggle("unfolded");
 });
